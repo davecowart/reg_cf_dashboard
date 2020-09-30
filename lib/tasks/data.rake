@@ -11,6 +11,8 @@ namespace :data do
     newest_data = latest_import.length == 0 ? { year: 2016, quarter: 1 } : latest_import[0]
     next_data = newest_data[:quarter] == 4 ? { year: newest_data[:year] + 1, quarter: 1 } : { year: newest_data[:year], quarter: newest_data[:quarter] + 1 }
 
+    downcase_converter = lambda { |header| header.downcase }
+
     while true do
       begin
         puts "Looking for #{next_data}"
@@ -25,7 +27,7 @@ namespace :data do
               content = entry.get_input_stream.read
 
               # parse TSV
-              parsed = CSV.parse(content, col_sep: "\t", headers: true)
+              parsed = CSV.parse(content, col_sep: "\t", headers: true, header_converters: downcase_converter)
 
               # store in database
               Disclosure.insert_all(parsed.map{|p| p.to_hash.merge(next_data)})
@@ -37,7 +39,7 @@ namespace :data do
               content = entry.get_input_stream.read
 
               # parse TSV
-              parsed = CSV.parse(content, col_sep: "\t", headers: true)
+              parsed = CSV.parse(content, col_sep: "\t", headers: true, header_converters: downcase_converter)
 
               # store in database
               Issuer.insert_all(parsed.map{|p| p.to_hash})

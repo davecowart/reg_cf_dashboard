@@ -1,3 +1,3 @@
 class Disclosure < ApplicationRecord
-  has_one :issuer, foreign_key: 'ACCESSION_NUMBER', primary_key: 'ACCESSION_NUMBER'
+  has_one :issuer, foreign_key: 'accession_number', primary_key: 'accession_number'
 end

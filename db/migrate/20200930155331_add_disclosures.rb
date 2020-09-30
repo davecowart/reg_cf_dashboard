@@ -1,39 +1,39 @@
 class AddDisclosures < ActiveRecord::Migration[6.0]
   def change
     create_table :disclosures do |t|
-      t.string :ACCESSION_NUMBER
-      t.string :COMPENSATIONAMOUNT, null: true
-      t.string :FINANCIALINTEREST, null: true
-      t.string :SECURITYOFFEREDTYPE, null: true
-      t.string :SECURITYOFFEREDOTHERDESC, null: true
-      t.integer :NOOFSECURITYOFFERED, null: true
-      t.float :PRICE, null: true
-      t.string :PRICEDETERMINATIONMETHOD, null: true
-      t.float :OFFERINGAMOUNT, null: true
-      t.boolean :OVERSUBSCRIPTIONACCEPTED, null: true
-      t.string :OVERSUBSCRIPTIONALLOCATIONTYPE, null: true
-      t.string :DESCOVERSUBSCRIPTION, null: true
-      t.float :MAXIMUMOFFERINGAMOUNT, null: true
-      t.date :DEADLINEDATE, null: true
-      t.integer :CURRENTEMPLOYEES, null: true
-      t.float :TOTALASSETMOSTRECENTFISCALYEAR, null: true
-      t.float :TOTALASSETPRIORFISCALYEAR, null: true
-      t.float :CASHEQUIMOSTRECENTFISCALYEAR, null: true
-      t.float :CASHEQUIPRIORFISCALYEAR, null: true
-      t.float :ACTRECEIVEDRECENTFISCALYEAR, null: true
-      t.float :ACTRECEIVEDPRIORFISCALYEAR, null: true
-      t.float :SHORTTERMDEBTMRECENTFISCALYEAR, null: true
-      t.float :SHORTTERMDEBTPRIORFISCALYEAR, null: true
-      t.float :LONGTERMDEBTRECENTFISCALYEAR, null: true
-      t.float :LONGTERMDEBTPRIORFISCALYEAR, null: true
-      t.float :REVENUEMOSTRECENTFISCALYEAR, null: true
-      t.float :REVENUEPRIORFISCALYEAR, null: true
-      t.float :COSTGOODSSOLDRECENTFISCALYEAR, null: true
-      t.float :COSTGOODSSOLDPRIORFISCALYEAR, null: true
-      t.float :TAXPAIDMOSTRECENTFISCALYEAR, null: true
-      t.float :TAXPAIDPRIORFISCALYEAR, null: true
-      t.float :NETINCOMEMOSTRECENTFISCALYEAR, null: true
-      t.float :NETINCOMEPRIORFISCALYEAR, null: true
+      t.string :accession_number
+      t.string :compensationamount, null: true
+      t.string :financialinterest, null: true
+      t.string :securityofferedtype, null: true
+      t.string :securityofferedotherdesc, null: true
+      t.integer :noofsecurityoffered, null: true
+      t.float :price, null: true
+      t.string :pricedeterminationmethod, null: true
+      t.float :offeringamount, null: true
+      t.boolean :oversubscriptionaccepted, null: true
+      t.string :oversubscriptionallocationtype, null: true
+      t.string :descoversubscription, null: true
+      t.float :maximumofferingamount, null: true
+      t.date :deadlinedate, null: true
+      t.integer :currentemployees, null: true
+      t.float :totalassetmostrecentfiscalyear, null: true
+      t.float :totalassetpriorfiscalyear, null: true
+      t.float :cashequimostrecentfiscalyear, null: true
+      t.float :cashequipriorfiscalyear, null: true
+      t.float :actreceivedrecentfiscalyear, null: true
+      t.float :actreceivedpriorfiscalyear, null: true
+      t.float :shorttermdebtmrecentfiscalyear, null: true
+      t.float :shorttermdebtpriorfiscalyear, null: true
+      t.float :longtermdebtrecentfiscalyear, null: true
+      t.float :longtermdebtpriorfiscalyear, null: true
+      t.float :revenuemostrecentfiscalyear, null: true
+      t.float :revenuepriorfiscalyear, null: true
+      t.float :costgoodssoldrecentfiscalyear, null: true
+      t.float :costgoodssoldpriorfiscalyear, null: true
+      t.float :taxpaidmostrecentfiscalyear, null: true
+      t.float :taxpaidpriorfiscalyear, null: true
+      t.float :netincomemostrecentfiscalyear, null: true
+      t.float :netincomepriorfiscalyear, null: true
       t.integer :year
       t.integer :quarter
     end
