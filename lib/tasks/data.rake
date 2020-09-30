@@ -30,7 +30,7 @@ namespace :data do
               parsed = CSV.parse(content, col_sep: "\t", headers: true, header_converters: downcase_converter)
 
               # store in database
-              Disclosure.insert_all(parsed.map{|p| p.to_hash.merge(next_data)})
+              Disclosure.insert_all(parsed.map{|p| p.to_hash.merge(next_data).merge({accession_number_sub: p['accession_number'].split("-")[0]})})
               Import.insert(next_data)
             elsif entry.name.end_with?("FORM_C_ISSUER_INFORMATION.tsv")
               puts "Extracting #{entry.name}"
@@ -49,7 +49,8 @@ namespace :data do
         end
 
         next_data = next_data[:quarter] == 4 ? { year: next_data[:year] + 1, quarter: 1 } : { year: next_data[:year], quarter: next_data[:quarter] + 1 }
-      rescue
+      rescue => e
+        puts e
         # break loop if newer file doesn't exist
         puts 'Newer file not found'
         break

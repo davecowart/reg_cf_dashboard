@@ -17,6 +17,7 @@ ActiveRecord::Schema.define(version: 2020_09_30_174858) do
 
   create_table "disclosures", force: :cascade do |t|
     t.string "accession_number"
+    t.string "accession_number_sub"
     t.string "compensationamount"
     t.string "financialinterest"
     t.string "securityofferedtype"

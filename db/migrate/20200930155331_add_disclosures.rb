@@ -2,6 +2,7 @@ class AddDisclosures < ActiveRecord::Migration[6.0]
   def change
     create_table :disclosures do |t|
       t.string :accession_number
+      t.string :accession_number_sub
       t.string :compensationamount, null: true
       t.string :financialinterest, null: true
       t.string :securityofferedtype, null: true
