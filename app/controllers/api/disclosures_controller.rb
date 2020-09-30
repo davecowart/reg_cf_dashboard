@@ -14,6 +14,10 @@ class Api::DisclosuresController < ApplicationController
     puts "order #{order}"
 
     latest_ids = Disclosure.group(:accession_number_sub).maximum(:id).values
-    render json: Disclosure.includes(:issuer).where(id: latest_ids).order(order).offset(offset).limit(limit).to_json(include: :issuer)
+    output = {
+      disclosures: Disclosure.includes(:issuer).where(id: latest_ids).order(order).offset(offset).limit(limit).to_json(include: :issuer),
+      pages: latest_ids.count / limit
+    }
+    render json: output
   end
 end

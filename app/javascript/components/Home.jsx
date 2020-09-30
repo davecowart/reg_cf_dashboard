@@ -40,7 +40,7 @@ const Table = ({columns, data, fetchData, isLoading, pageCount: controlledPageCo
       <div>
         <button onClick={() => previousPage()} disabled={!canPreviousPage}>Previous Page</button>
         <button onClick={() => nextPage()} disabled={!canNextPage}>Next Page</button>
-        <p>Page {pageIndex + 1} of {pageOptions.length} ({pageSize})</p>
+        <p>Page {pageIndex + 1} of {pageOptions.length}</p>
       </div>
       <table {...getTableProps()} className="table">
         <thead>
@@ -95,9 +95,9 @@ export default () => {
 
     if (fetchId === fetchIdRef.current) {
       setIsLoading(true);
-      const { data } = await axios.get(`/api/disclosures/index?pageSize=${pageSize}&pageIndex=${pageIndex}`);
-      setData(data);
-      setPageCount(5);
+      const { data: { disclosures, pages } } = await axios.get(`/api/disclosures/index?pageSize=${pageSize}&pageIndex=${pageIndex}`);
+      setData(JSON.parse(disclosures));
+      setPageCount(pages);
       setIsLoading(false);
     }
   }, []);
