@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_30_155331) do
+ActiveRecord::Schema.define(version: 2020_09_30_174858) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -56,6 +56,28 @@ ActiveRecord::Schema.define(version: 2020_09_30_155331) do
   create_table "imports", force: :cascade do |t|
     t.integer "year"
     t.integer "quarter"
+  end
+
+  create_table "issuers", force: :cascade do |t|
+    t.string "ACCESSION_NUMBER"
+    t.boolean "ISAMENDMENT"
+    t.string "PROGRESSUPDATE"
+    t.string "NATUREOFAMENDMENT"
+    t.string "NAMEOFISSUER"
+    t.string "LEGALSTATUSFORM"
+    t.string "LEGALSTATUSOTHERDESC"
+    t.string "JURISDICTIONORGANIZATION"
+    t.string "DATEINCORPORATION"
+    t.string "STREET1"
+    t.string "STREET2"
+    t.string "CITY"
+    t.string "STATEORCOUNTRY"
+    t.string "ZIPCODE"
+    t.string "ISSUERWEBSITE"
+    t.string "COMPANYNAME"
+    t.string "COMMISSIONCIK"
+    t.string "COMMISSIONFILENUMBER"
+    t.string "CRDNUMBER"
   end
 
 end

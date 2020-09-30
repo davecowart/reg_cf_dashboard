@@ -21,6 +21,7 @@ namespace :data do
             if entry.name.end_with?("FORM_C_DISCLOSURE.tsv") then
               puts "Extracting #{entry.name}"
 
+              #read contents
               content = entry.get_input_stream.read
 
               # parse TSV
@@ -28,6 +29,18 @@ namespace :data do
 
               # store in database
               Disclosure.insert_all(parsed.map{|p| p.to_hash.merge(next_data)})
+              Import.insert(next_data)
+            elsif entry.name.end_with?("FORM_C_ISSUER_INFORMATION.tsv")
+              puts "Extracting #{entry.name}"
+
+              #read contents
+              content = entry.get_input_stream.read
+
+              # parse TSV
+              parsed = CSV.parse(content, col_sep: "\t", headers: true)
+
+              # store in database
+              Issuer.insert_all(parsed.map{|p| p.to_hash})
               Import.insert(next_data)
             end
           end

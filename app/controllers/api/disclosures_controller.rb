@@ -1,5 +1,5 @@
 class Api::DisclosuresController < ApplicationController
   def index
-    render json: Disclosure.all
+    render json: Disclosure.includes(:issuer).all
   end
 end
