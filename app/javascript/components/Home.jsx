@@ -142,6 +142,12 @@ export default () => {
             <div>
               <h2>{selectedRow.issuer.nameofissuer}</h2>
               <ul className="list-group">
+                {
+                  selectedRow.issuer.issuerwebsite !== 'None' &&
+                  <li className="list-group-item">
+                    <a href={'http://' + selectedRow.issuer.issuerwebsite} target="_blank">{selectedRow.issuer.issuerwebsite}</a>
+                  </li>
+                }
                 <li className="list-group-item">
                   <address>
                     {selectedRow.issuer.street1}<br/>
@@ -149,7 +155,7 @@ export default () => {
                       selectedRow.issuer.street2 &&
                       <>{selectedRow.issuer.street2}<br/></>
                     }
-                    {selectedRow.issuer.city}, {selectedRow.issuer.state}
+                    {selectedRow.issuer.city}, {selectedRow.issuer.stateorcountry}
                   </address>
                 </li>
                 <li className="list-group-item">
@@ -230,7 +236,6 @@ export default () => {
                   </tr>
                 </tbody>
               </table>
-              {/*<div>{JSON.stringify(selectedRow)}</div>*/}
             </div>
           }
         </div>
