@@ -2,6 +2,19 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { useTable, usePagination } from 'react-table';
 import axios from 'axios';
+import { XYPlot, ChartLabel, DiscreteColorLegend, LineSeries, VerticalGridLines, HorizontalGridLines, XAxis, YAxis } from 'react-vis';
+
+const priceFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0
+});
+
+const price = amount => {
+  if (!amount || isNaN(amount)) return;
+  return priceFormatter.format(amount);
+};
 
 const Table = ({columns, data, fetchData, isLoading, pageCount: controlledPageCount, selectedRow, setSelectedRow}) => {
   const {
@@ -87,13 +100,75 @@ const ActionLink = ({action, children, ...rest}) => (
     }}>{children}</a>
 );
 
+const Graph = ({title, series, selectedRow}) => {
+  const lineData = (selectedRow, fields) => {
+    if (!selectedRow[fields[0]] && !selectedRow[fields[1]]) return null;
+    return [
+      { x: 1, y: selectedRow[fields[0]] || 0, title: fields[0] },
+      { x: 2, y: selectedRow[fields[1]] || 0, title: fields[1] },
+    ];
+  };
+
+  const showGraph = (selectedRow, series) => {
+    return series.some(s => selectedRow[s.fields[0]] && selectedRow[s.fields[1]])
+  };
+
+  return (
+    <div style={{marginBottom: 100}}>
+      <h4>{title}</h4>
+      {
+        showGraph(selectedRow, series) &&
+        <XYPlot height={300} width={400} margin={{left: 100, right: 25}}>
+          <HorizontalGridLines />
+          <VerticalGridLines />
+          <XAxis
+            style={{
+              line: {stroke: '#ADDDE1'},
+              ticks: {stroke: '#ADDDE1'},
+              text: {stroke: 'none', fill: '#6b6b76', fontWeight: 600, fontSize: 12}
+            }}
+            tickTotal={2}
+            tickValues={[1,2]}
+            tickLabelAngle={0}
+            tickFormat={value => value === 1 ? selectedRow.year - 2 : selectedRow.year - 1}
+            />
+          <YAxis
+            style={{
+              line: {stroke: '#ADDDE1'},
+              ticks: {stroke: '#ADDDE1'},
+              text: {stroke: 'none', fill: '#6b6b76', fontWeight: 600, fontSize: 12}
+            }}
+            tickFormat={value => price(value)} />
+          {
+            series.map(s => (
+              <LineSeries key={s.title} data={lineData(selectedRow, s.fields)} color={s.color} strokeWidth={5} style={{
+                strokeDasharray: '7 3'
+              }} />
+            ))
+          }
+          <DiscreteColorLegend orientation="horizontal" items={series.map(s => ({
+              title: s.title,
+              color: s.color,
+              strokeWidth: 10,
+              strokeDasharray: '7 3'
+            }))} />
+        </XYPlot>
+      }
+      {
+        !showGraph(selectedRow, series) &&
+        <p>No data available</p>
+      }
+    </div>
+  );
+};
+
 export default () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [selectedRow, setSelectedRow] = useState();
   const fetchIdRef = useRef(0);
-  const [currentTab, setCurrentTab] = useState('overview');
+  const [currentTab, setCurrentTab] = useState('graphs');
 
   const fetchData = useCallback(async ({pageIndex, pageSize}) => {
     const fetchId = ++fetchIdRef.current;
@@ -114,18 +189,6 @@ export default () => {
     { Header: 'State', accessor: 'issuer.stateorcountry' }
   ], []);
 
-  const priceFormatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  });
-
-  const price = amount => {
-    if (!amount || isNaN(amount)) return;
-    return priceFormatter.format(amount);
-  };
-
   return (
     <div className="container mw-100">
       <div className="row">
@@ -145,13 +208,19 @@ export default () => {
           {
             selectedRow &&
             <div>
-              <h2>{selectedRow.issuer.nameofissuer}</h2>
+              <div className="d-flex justify-content-between">
+                <h2>{selectedRow.issuer.nameofissuer}</h2>
+                <button onClick={() => setSelectedRow(null)}>X</button>
+              </div>
               <ul className="nav nav-tabs my-3">
                 <li className="nav-item">
                   <ActionLink className={'nav-link' + (currentTab === 'overview' ? ' active' : '')} action={() => setCurrentTab('overview')}>Overview</ActionLink>
                 </li>
                 <li className="nav-item">
                   <ActionLink className={'nav-link' + (currentTab === 'financials' ? ' active' : '')} action={() => setCurrentTab('financials')}>Financials</ActionLink>
+                </li>
+                <li className="nav-item">
+                  <ActionLink className={'nav-link' + (currentTab === 'graphs' ? ' active' : '')} action={() => setCurrentTab('graphs')}>Graphs</ActionLink>
                 </li>
               </ul>
 
@@ -206,58 +275,89 @@ export default () => {
                   <thead>
                     <tr>
                       <th></th>
-                      <th>Most Recent FY</th>
-                      <th>Prior FY</th>
+                      <th>Prior FY ({selectedRow.year - 2})</th>
+                      <th>Most Recent FY ({selectedRow.year - 1})</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <th>Total Assets</th>
-                      <th>{price(selectedRow.totalassetmostrecentfiscalyear)}</th>
                       <th>{price(selectedRow.totalassetpriorfiscalyear)}</th>
+                      <th>{price(selectedRow.totalassetmostrecentfiscalyear)}</th>
                     </tr>
                     <tr>
                       <th>Cash</th>
-                      <th>{price(selectedRow.cashequimostrecentfiscalyear)}</th>
                       <th>{price(selectedRow.cashequipriorfiscalyear)}</th>
+                      <th>{price(selectedRow.cashequimostrecentfiscalyear)}</th>
                     </tr>
                     <tr>
                       <th>Accts Receivable</th>
-                      <th>{price(selectedRow.actreceivedrecentfiscalyear)}</th>
                       <th>{price(selectedRow.actreceivedpriorfiscalyear)}</th>
+                      <th>{price(selectedRow.actreceivedrecentfiscalyear)}</th>
                     </tr>
                     <tr>
                       <th>Short-Term Debt</th>
-                      <th>{price(selectedRow.shorttermdebtmrecentfiscalyear)}</th>
                       <th>{price(selectedRow.shorttermdebtpriorfiscalyear)}</th>
+                      <th>{price(selectedRow.shorttermdebtmrecentfiscalyear)}</th>
                     </tr>
                     <tr>
                       <th>Long-Term Debt</th>
-                      <th>{price(selectedRow.longtermdebtrecentfiscalyear)}</th>
                       <th>{price(selectedRow.longtermdebtpriorfiscalyear)}</th>
+                      <th>{price(selectedRow.longtermdebtrecentfiscalyear)}</th>
                     </tr>
                     <tr>
                       <th>Revenue</th>
-                      <th>{price(selectedRow.revenuemostrecentfiscalyear)}</th>
                       <th>{price(selectedRow.revenuepriorfiscalyear)}</th>
+                      <th>{price(selectedRow.revenuemostrecentfiscalyear)}</th>
                     </tr>
                     <tr>
                       <th>COGS</th>
-                      <th>{price(selectedRow.costgoodssoldrecentfiscalyear)}</th>
                       <th>{price(selectedRow.costgoodssoldpriorfiscalyear)}</th>
+                      <th>{price(selectedRow.costgoodssoldrecentfiscalyear)}</th>
                     </tr>
                     <tr>
                       <th>Tax Paid</th>
-                      <th>{price(selectedRow.taxpaidmostrecentfiscalyear)}</th>
                       <th>{price(selectedRow.taxpaidpriorfiscalyear)}</th>
+                      <th>{price(selectedRow.taxpaidmostrecentfiscalyear)}</th>
                     </tr>
                     <tr>
                       <th>Net Income</th>
-                      <th>{price(selectedRow.netincomemostrecentfiscalyear)}</th>
                       <th>{price(selectedRow.netincomepriorfiscalyear)}</th>
+                      <th>{price(selectedRow.netincomemostrecentfiscalyear)}</th>
                     </tr>
                   </tbody>
                 </table>
+              }
+              {
+                currentTab === 'graphs' &&
+                <div>
+                  <Graph
+                    title="Debt"
+                    selectedRow={selectedRow}
+                    series={[
+                      { title: 'Long Term Debt', color: 'red', fields: ['longtermdebtpriorfiscalyear', 'longtermdebtrecentfiscalyear'] },
+                      { title: 'Short Term Debt', color: 'orange', fields: ['shorttermdebtpriorfiscalyear', 'shorttermdebtmrecentfiscalyear'] }
+                    ]}/>
+                  <hr />
+                  <Graph
+                    title="Assets"
+                    selectedRow={selectedRow}
+                    series={[
+                      { title: 'Total Assets', color: 'blue', fields: ['totalassetpriorfiscalyear', 'totalassetmostrecentfiscalyear'] },
+                      { title: 'Cash', color: 'green', fields: ['cashequipriorfiscalyear', 'cashequimostrecentfiscalyear'] },
+                      { title: 'Accounts Receivable', color: 'orange', fields: ['actreceivedpriorfiscalyear', 'actreceivedrecentfiscalyear'] }
+                    ]}/>
+                  <hr />
+                  <Graph
+                    title="Income"
+                    selectedRow={selectedRow}
+                    series={[
+                      { title: 'Revenue', color: 'green', fields: ['revenuepriorfiscalyear', 'revenuemostrecentfiscalyear'] },
+                      { title: 'Cost of Goods Sold', color: 'orange', fields: ['costgoodssoldpriorfiscalyear', 'costgoodssoldrecentfiscalyear'] },
+                      { title: 'Taxes Paid', color: 'red', fields: ['taxpaidpriorfiscalyear', 'taxpaidmostrecentfiscalyear'] },
+                      { title: 'Net Income', color: 'blue', fields: ['netincomepriorfiscalyear', 'netincomemostrecentfiscalyear'] }
+                    ]}/>
+                </div>
               }
             </div>
           }
