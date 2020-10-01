@@ -20,4 +20,14 @@ class Api::DisclosuresController < ApplicationController
     }
     render json: output
   end
+
+  def stats
+    latest_ids = Disclosure.group(:accession_number_sub).maximum(:id).values
+    accession_numbers = Disclosure.includes(:issuer).where(id: latest_ids).map{|d| d.accession_number}
+    states = Issuer.where(accession_number: accession_numbers).group(:stateorcountry).count
+    output = {
+      states: states
+    }
+    render json: output
+  end
 end

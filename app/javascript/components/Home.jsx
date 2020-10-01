@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTable, usePagination } from 'react-table';
 import axios from 'axios';
 import { XYPlot, ChartLabel, DiscreteColorLegend, LineSeries, VerticalGridLines, HorizontalGridLines, XAxis, YAxis } from 'react-vis';
+import USAMap from "react-usa-map";
 
 const priceFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -168,7 +169,8 @@ export default () => {
   const [pageCount, setPageCount] = useState(0);
   const [selectedRow, setSelectedRow] = useState();
   const fetchIdRef = useRef(0);
-  const [currentTab, setCurrentTab] = useState('graphs');
+  const [currentTab, setCurrentTab] = useState('overview');
+  const [states, setStates] = useState({});
 
   const fetchData = useCallback(async ({pageIndex, pageSize}) => {
     const fetchId = ++fetchIdRef.current;
@@ -180,6 +182,28 @@ export default () => {
       setPageCount(pages);
       setIsLoading(false);
     }
+  }, []);
+
+  const fetchStats = useCallback(async () => {
+    const { data: { states } } = await axios.get(`/api/disclosures/stats`);
+    const statesMap = {};
+    let maxValue = 0;
+    for (const key of Object.keys(states)) {
+      if (Math.sqrt(states[key]) > maxValue) maxValue = Math.sqrt(states[key]);
+    }
+    for (const key of Object.keys(states)) {
+      if (!key) continue;
+      statesMap[key] = {
+        fill: '#0000FF' + Math.floor((Math.sqrt(states[key]) / maxValue) * 255).toString(16).toUpperCase().padStart(2, '0')
+      };
+    }
+    console.log('statesMap', statesMap);
+    setStates(statesMap);
+  }, []);
+
+  useEffect(() => {
+    console.log('getting stats')
+    fetchStats();
   }, []);
 
   const columns = useMemo(() => [
@@ -210,7 +234,7 @@ export default () => {
             <div>
               <div className="d-flex justify-content-between">
                 <h2>{selectedRow.issuer.nameofissuer}</h2>
-                <button onClick={() => setSelectedRow(null)}>X</button>
+                <button className="btn btn-secondary" onClick={() => setSelectedRow(null)}>X</button>
               </div>
               <ul className="nav nav-tabs my-3">
                 <li className="nav-item">
@@ -360,6 +384,13 @@ export default () => {
                 </div>
               }
             </div>
+          }
+          {
+            !selectedRow &&
+            <>
+              <h3>Disclosures per State</h3>
+              <USAMap width={400} height={300} customize={states} defaultFill="#0000FF00" title="Disclosures per state" />
+            </>
           }
         </div>
       </div>
