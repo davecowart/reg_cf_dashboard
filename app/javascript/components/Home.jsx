@@ -70,7 +70,7 @@ const Table = ({columns, data, fetchData, isLoading, pageCount: controlledPageCo
             page.map((row, i) => {
               prepareRow(row);
               return (
-                <tr style={selectedRow && selectedRow.id === row.original.id ? { backgroundColor: 'green'}: null} onClick={() => setSelectedRow(row.original)} {...row.getRowProps()}>
+                <tr style={selectedRow && selectedRow.id === row.original.id ? { backgroundColor: '#252A45', color: '#FFFFFF', cursor: 'pointer' } : { cursor: 'pointer' }} onClick={() => setSelectedRow(row.original)} {...row.getRowProps()}>
                   {
                     row.cells.map(cell => (
                       <td className="text-nowrap" {...cell.getCellProps()}>
@@ -157,7 +157,7 @@ const Graph = ({title, series, selectedRow}) => {
       }
       {
         !showGraph(selectedRow, series) &&
-        <p>No data available</p>
+        <div class="alert alert-warning m-3" role="alert">No data available</div>
       }
     </div>
   );
@@ -194,15 +194,13 @@ export default () => {
     for (const key of Object.keys(states)) {
       if (!key) continue;
       statesMap[key] = {
-        fill: '#0000FF' + Math.floor((Math.sqrt(states[key]) / maxValue) * 255).toString(16).toUpperCase().padStart(2, '0')
+        fill: '#252A45' + Math.floor((Math.sqrt(states[key]) / maxValue) * 255).toString(16).toUpperCase().padStart(2, '0')
       };
     }
-    console.log('statesMap', statesMap);
     setStates(statesMap);
   }, []);
 
   useEffect(() => {
-    console.log('getting stats')
     fetchStats();
   }, []);
 
@@ -217,7 +215,7 @@ export default () => {
     <div className="container mw-100">
       <div className="row">
         <div className="col-7">
-          <h1>RegCF Dashboard</h1>
+          <h1 className="my-4">Regulation Crowdfunding Dashboard</h1>
           <Table
             columns={columns}
             data={data}
@@ -234,7 +232,7 @@ export default () => {
             <div>
               <div className="d-flex justify-content-between">
                 <h2>{selectedRow.issuer.nameofissuer}</h2>
-                <button className="btn btn-secondary" onClick={() => setSelectedRow(null)}>X</button>
+                <button className="btn btn-outline-secondary btn-sm" onClick={() => setSelectedRow(null)}>&nbsp;X&nbsp;</button>
               </div>
               <ul className="nav nav-tabs my-3">
                 <li className="nav-item">
@@ -389,7 +387,7 @@ export default () => {
             !selectedRow &&
             <>
               <h3>Disclosures per State</h3>
-              <USAMap width={400} height={300} customize={states} defaultFill="#0000FF00" title="Disclosures per state" />
+              <USAMap width={400} height={300} customize={states} defaultFill="#252A4500" title="Disclosures per state" />
             </>
           }
         </div>

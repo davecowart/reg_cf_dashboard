@@ -13,3 +13,13 @@
  *= require_tree .
  *= require_self
  */
+
+ $theme-colors: (
+   "primary": #FD2A33,
+   "secondary": #252A45,
+   "dark": #242946
+ );
+
+$font-family-sans-serif: Poppins,"Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+
+@import "bootstrap/scss/bootstrap";

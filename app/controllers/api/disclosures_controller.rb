@@ -4,15 +4,10 @@ class Api::DisclosuresController < ApplicationController
     limit = 50 if limit == 0
     offset = limit * (params[:pageIndex].to_i || 0)
     key = params[:orderBy] || 'accession_number'
-    direction = params[:orderDirection] == 'DESC' ? 'DESC' : 'ASC'
+    direction = params[:orderDirection] == 'ASC' ? 'ASC' : 'DESC'
 
     order = "#{key} #{direction}"
-    puts "limit #{limit}"
-    puts "offset #{offset}"
-    puts "key #{key}"
-    puts "direction #{direction}"
-    puts "order #{order}"
-
+    
     latest_ids = Disclosure.group(:accession_number_sub).maximum(:id).values
     output = {
       disclosures: Disclosure.includes(:issuer).where(id: latest_ids).order(order).offset(offset).limit(limit).to_json(include: :issuer),
